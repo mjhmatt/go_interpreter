@@ -2,6 +2,7 @@ package lexer
 
 import "go_interpreter/token"
 
+// Lexer struct for tokenizing input
 type Lexer struct {
 	input        string
 	position     int  // current position in input (points to current char)
@@ -9,18 +10,21 @@ type Lexer struct {
 	ch           byte // current char under examination
 }
 
+// initialise new Lexer
 func New(input string) *Lexer {
 	l := &Lexer{input: input}
-	l.readChar()
+	l.readChar() //read first character
 	return l
 }
 
+// skip whitespace/newline
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
 	}
 }
 
+// return next token from input
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
@@ -94,9 +98,10 @@ func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
+// next character in input
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
-		l.ch = 0
+		l.ch = 0 //end of input
 	} else {
 		l.ch = l.input[l.readPosition]
 	}
@@ -104,6 +109,7 @@ func (l *Lexer) readChar() {
 	l.readPosition += 1
 }
 
+// peeks at the following character in input
 func (l *Lexer) peekChar() byte {
 	if l.readPosition >= len(l.input) {
 		return 0
@@ -112,6 +118,7 @@ func (l *Lexer) peekChar() byte {
 	}
 }
 
+// read identifier (variable names, keywords)
 func (l *Lexer) readIdentifier() string {
 	position := l.position
 	for isLetter(l.ch) {
