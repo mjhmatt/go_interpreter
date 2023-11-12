@@ -16,12 +16,14 @@ func TestLetStatemenets(t *testing.T) {
 	p := New(l)
 
 	program := p.ParseProgram()
+	checkParserErrors(t, p)
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
 	}
 
 	if len(program.Statements) != 3 {
-		t.Fatal("profram does not have 3 statements has", len(program.Statements))
+		t.Fatal("program does not have 3 statements has", len(program.Statements))
+
 	}
 
 	tests := []struct {
@@ -38,6 +40,19 @@ func TestLetStatemenets(t *testing.T) {
 			return
 		}
 	}
+}
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+	lenErrors := len(errors)
+	if lenErrors == 0 {
+		return
+	}
+	t.Errorf("parser had %d errors", lenErrors)
+	for _, msg := range errors {
+		t.Errorf("parser error %q", msg)
+	}
+	t.FailNow()
+
 }
 
 func testLetStatement(t *testing.T, s ast.Statement, name string) bool {

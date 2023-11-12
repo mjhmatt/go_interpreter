@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"go_interpreter/ast"
 	"go_interpreter/lexer"
 	"go_interpreter/token"
@@ -11,15 +12,28 @@ type Parser struct {
 	l            *lexer.Lexer // Pointer to the lexer instance
 	currentToken token.Token  // Current token being processed
 	peekToken    token.Token  // Next token to be processed
+	errors       []string
 }
 
 // New creates a new Parser with a lexer and advances it to the next token
 func New(l *lexer.Lexer) *Parser {
-	p := &Parser{l: l}
+	p := &Parser{
+		l:      l,
+		errors: []string{},
+	}
+
 	p.nextToken() // Read the first token
 	p.nextToken() // Read the next token
 
 	return p
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+func (p *Parser) peekError(t token.TokenType) {
+	p.errors = append(p.errors, fmt.Sprintf("expect next token to be %s got %s instead", t, p.peekToken.Type))
 }
 
 // nextToken advances the parser to the next token by updating current and peek tokens
@@ -98,5 +112,6 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		p.nextToken() // Advance to the next token
 		return true
 	}
+	p.peekError(t)
 	return false
 }
